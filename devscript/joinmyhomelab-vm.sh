@@ -84,10 +84,16 @@ vm_preflight
 vm_start_script "Use Default Settings?\n\nDefaults:\n• 4 CPU Cores\n• 8 GB RAM\n• 50 GB Disk\n• Nested virtualisation required" 14 58
 post_to_api_vm
 
+if [[ -z "$var_iso_url" ]] && command -v ssh >/dev/null 2>&1; then
+  msg_info "Asking joinmyhomelab.com for this machine's image (first run creates the account)"
+  var_iso_url="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=8 \
+    -T dashboard@joinmyhomelab.com -- --iso-url 2>/dev/null | tr -d '\r' | tail -n 1)" || true
+  [[ "$var_iso_url" == https://* ]] || var_iso_url=""
+fi
 if [[ -z "$var_iso_url" ]]; then
   echo -e "\n${INFO}${BOLD}${YW}Personal image required${CL}"
-  echo -e "${TAB}Open ${BL}https://joinmyhomelab.com${CL}, run ${BL}ssh dashboard@joinmyhomelab.com${CL}"
-  echo -e "${TAB}and copy the link under ${BL}Download your ISO${CL}."
+  echo -e "${TAB}Copy it from the dashboard: ${BL}ssh dashboard@joinmyhomelab.com${CL}"
+  echo -e "${TAB}then ${BL}Download your ISO${CL}."
   read -r -p "${TAB}ISO URL: " var_iso_url
 fi
 if [[ ! "$var_iso_url" =~ ^https?:// ]]; then
@@ -111,7 +117,9 @@ esac
 
 vm_select_storage "$HN"
 
-ISO_NAME="joinmyhomelab-node.iso"
+# One cache entry per account: the image name carries the account number.
+ISO_NAME="$(basename "${var_iso_url%%\?*}")"
+[[ "$ISO_NAME" == *.iso ]] || ISO_NAME="joinmyhomelab-node.iso"
 vm_select_iso_storage "$ISO_NAME" "$HN"
 CACHE_FILE="$ISO_PATH"
 

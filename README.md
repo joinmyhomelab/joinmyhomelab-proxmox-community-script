@@ -3,13 +3,18 @@
 One command creates a VM on Proxmox that joins the [Join My Homelab](https://joinmyhomelab.com/) community cloud. The VM is the node: stop it to stop lending, delete it to leave.
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/bash3r777/joinmyhomelab-proxmox-community-script/main/joinmyhomelab-node.sh)" -- --iso 'https://…/joinmyhomelab-<account>.iso'
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/bash3r777/joinmyhomelab-proxmox-community-script/main/joinmyhomelab-node.sh)"
 ```
 
-The ISO link is personal. Get it from your dashboard:
+If this host already has a key you use with Join My Homelab, the script asks the
+platform for the image itself — `ssh -T dashboard@joinmyhomelab.com -- --iso-url`
+— so there is nothing to copy. The first connection creates the account.
+
+No key on the host? Pass the link from your dashboard instead:
 
 ```bash
 ssh dashboard@joinmyhomelab.com     # then "Download your ISO"
+... --iso 'https://…/joinmyhomelab-<account>.iso'
 ```
 
 ## What it does

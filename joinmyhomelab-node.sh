@@ -282,9 +282,22 @@ if [ "$UNINSTALL" -eq 1 ]; then
   exit 0
 fi
 
+# Ask the platform for this machine's image. The key already here is the
+# account, and the first connection creates it if there is none — say so
+# rather than fail into a prompt.
+if [ -z "$ISO_URL" ] && [ -z "$ISO_FILE" ] && command -v ssh >/dev/null 2>&1; then
+  say "asking joinmyhomelab.com for this machine's image… (first run creates your account)"
+  ISO_URL="$(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=8 \
+    -T dashboard@joinmyhomelab.com -- --iso-url 2>/dev/null | tr -d '\r' | tail -n 1)" || true
+  case "$ISO_URL" in
+    https://*) say "using your account's image" ;;
+    *) ISO_URL="" ;;
+  esac
+fi
+
 if [ -z "$ISO_URL" ] && [ -z "$ISO_FILE" ]; then
-  say "Open your dashboard and copy the personal ISO link:"
-  say "  ssh dashboard@joinmyhomelab.com  →  'Download your ISO'"
+  say "No key on this host yet. Copy the image link from your dashboard:"
+  say "  ssh dashboard@joinmyhomelab.com    (first connection creates the account)"
   read -r -p "ISO URL: " ISO_URL
   [ -n "$ISO_URL" ] || die "an ISO URL is required"
 fi
@@ -311,7 +324,11 @@ fi
 if [ -n "$ISO_FILE" ]; then
   iso_path="$ISO_FILE"
 else
-  iso_path="$ISO_DIR/$PREFIX.iso"
+  # The image is per account, so keep each one under the name the platform
+  # gave it. A shared cache name would hand a new account someone else's image.
+  iso_name="$(basename "${ISO_URL%%\?*}")"
+  case "$iso_name" in *.iso) ;; *) iso_name="$PREFIX.iso" ;; esac
+  iso_path="$ISO_DIR/$iso_name"
 fi
 iso_vol="$ISO_STORAGE:iso/$(basename "$iso_path")"
 
