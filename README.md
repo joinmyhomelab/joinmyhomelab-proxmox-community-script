@@ -77,6 +77,13 @@ Stops and deletes only the `joinmyhomelab-node*` VMs, after a confirmation.
 
 The ISO URL contains your account token. The script never prints it and does not store it; the downloaded image lives in `/var/lib/vz/template/iso/joinmyhomelab-node.iso`. Your node's VMs are readable by you as host operator — the platform says so plainly, and nothing confidential belongs on them.
 
+## Community-scripts submission
+
+`devscript/joinmyhomelab-vm.sh` is the same installer written on the
+[community-scripts](https://community-scripts.org) `vm-core.func` framework, for
+submission to their DevScripts catalogue. The standalone script above stays the
+official one.
+
 ## Development
 
 ```bash
