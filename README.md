@@ -3,7 +3,7 @@
 One command creates a VM on Proxmox that joins the [Join My Homelab](https://joinmyhomelab.com/) community cloud. The VM is the node: stop it to stop lending, delete it to leave.
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/bash3r777/joinmyhomelab-proxmox-community-script/main/joinmyhomelab-node.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/joinmyhomelab/joinmyhomelab-proxmox-community-script/main/joinmyhomelab-node.sh)"
 ```
 
 If this host already has a key you use with Join My Homelab, the script asks the
